@@ -1,0 +1,19 @@
+{
+  "name": "SpotifyDL",
+  "version": "0.1.0",
+  "description": "",
+  "contributors": [],
+  "license": "MIT",
+  "scripts": {
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JairusSW/SpotifyDL.git"
+  },
+  "keywords": [],
+  "bugs": {
+    "url": "https://github.com/JairusSW/fass/issues"
+  },
+  "homepage": "https://github.com/JairusSW/fass#readme"
+}
