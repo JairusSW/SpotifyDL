@@ -18,16 +18,17 @@ const auth_1 = require("./auth");
 const play_dl_1 = require("play-dl");
 const ytdl_core_1 = __importDefault(require("ytdl-core"));
 const prism_media_1 = require("prism-media");
-const access_token = "BQCd4AWSCM5JQ5sJ5vNoKrioXDRSktpYEZ33S0nZmrsVvBS96YC1AWU4gP74GcyuTGqYKAnrKeTHPV_XO5iktRkgzAZbM8BzLVBYs_ZX_Lb1hSv2Hng"; /*getAccessToken(
-  "e16ba747847f4705b3f162645e6d6f14",
-  "648b8f2568924b86b5ad18925413951b"
-).then(console.log)*/
-function downloadTrack(track_id, access_token) {
-    return __awaiter(this, void 0, void 0, function* () {
+let access_token = "";
+function downloadTrack(track_id) {
+    return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
+        if (!access_token) {
+            access_token = (yield (0, auth_1.getAccessToken)("e16ba747847f4705b3f162645e6d6f14", "648b8f2568924b86b5ad18925413951b")).access_token;
+            console.log("Created Access Token: " + access_token);
+        }
         const track_info = yield (0, auth_1.getTrackInfo)(track_id, access_token);
         const name = track_info.name;
         const artist = track_info.artists[0].name;
-        console.log(`${artist} - ${name}`);
+        console.log(`Downloading ${artist} - ${name}`);
         const url = (yield (0, play_dl_1.search)(artist + " " + name, { limit: 1 }))[0].url;
         const info = yield ytdl_core_1.default.getInfo(url);
         const bestFormat = nextBestFormat(info.formats);
@@ -54,34 +55,40 @@ function downloadTrack(track_id, access_token) {
             ],
             shell: false,
         });
-        transcoder.pipe((0, fs_1.createWriteStream)(`dl/${artist} - ${name}.mp3`));
-        transcoder.on("close", () => {
-            console.log("closed");
+        transcoder.pipe((0, fs_1.createWriteStream)(`dl/${artist} - ${name.replace("/", "|")}.mp3`));
+        transcoder.on("end", () => {
+            console.log(`Finished Downloading ${artist} - ${name.replace("/", "|")}.mp3`);
+            resolve();
         });
-        transcoder.on("finish", () => {
-            console.log("finished");
+        transcoder.on("error", () => {
+            console.log(`Failed Downloading ${artist} - ${name.replace("/", "|")}.mp3`);
+            resolve();
         });
-    });
+    }));
 }
 exports.downloadTrack = downloadTrack;
 function nextBestFormat(formats) {
     formats = formats
-        .filter(format => format.bitrate)
-        .filter(format => !format.fps)
+        .filter((format) => format.bitrate)
+        .filter((format) => !format.fps)
         .sort((a, b) => b.bitrate - a.bitrate);
     return formats[0];
 }
-downloadTrack("4hL5RU7vwnquO8a7RKmFL8", access_token);
-function downloadPlaylist(playlist_id, access_token) {
+function downloadPlaylist(playlist_id) {
     return __awaiter(this, void 0, void 0, function* () {
+        if (!access_token) {
+            access_token = (yield (0, auth_1.getAccessToken)("e16ba747847f4705b3f162645e6d6f14", "648b8f2568924b86b5ad18925413951b")).access_token;
+            console.log("Created Access Token: " + access_token);
+        }
         const playlist_info = yield (0, auth_1.getPlaylistInfo)(playlist_id, access_token);
-        console.log(playlist_info);
         for (let i = 0; i < playlist_info.items.length; i++) {
             const track = playlist_info.items[i];
-            console.log(`Downloading ${track.track.artists[0].name} - ${track.track.name}`);
-            downloadTrack(track.track.id, access_token);
+            yield downloadTrack(track.track.id);
         }
     });
 }
 exports.downloadPlaylist = downloadPlaylist;
-downloadPlaylist("2QtTv6MY7SlP2BHuSo4zAG", access_token);
+downloadPlaylist("2QtTv6MY7SlP2BHuSo4zAG");
+/*downloadTrack(
+  "3ZtHqEyU0b1gG4CsOaVW28?"
+);*/
