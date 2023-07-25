@@ -4,9 +4,11 @@
   "description": "",
   "contributors": [],
   "license": "MIT",
-  "scripts": {
+  "scripts": {},
+  "devDependencies": {
+    "@types/node": "^20.4.4",
+    "typescript": "^5.1.6"
   },
-  "devDependencies": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/JairusSW/SpotifyDL.git"
@@ -15,5 +17,18 @@
   "bugs": {
     "url": "https://github.com/JairusSW/fass/issues"
   },
-  "homepage": "https://github.com/JairusSW/fass#readme"
+  "homepage": "https://github.com/JairusSW/fass#readme",
+  "dependencies": {
+    "@types/fluent-ffmpeg": "^2.1.21",
+    "dotenv": "^16.3.1",
+    "ffmpeg-static": "^5.1.0",
+    "fluent-ffmpeg": "^2.1.2",
+    "play-dl": "^1.9.6",
+    "prism-media": "^1.3.5",
+    "spotify-url-info": "^3.2.5",
+    "spotify-web-api-js": "^1.5.2",
+    "undici": "^5.22.1",
+    "ytdl-core": "^4.11.5",
+    "ytsr": "^3.8.2"
+  }
 }
