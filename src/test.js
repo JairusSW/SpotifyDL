@@ -28,42 +28,48 @@ function downloadTrack(track_id) {
         const track_info = yield (0, auth_1.getTrackInfo)(track_id, access_token);
         const name = track_info.name;
         const artist = track_info.artists[0].name;
-        console.log(`Downloading ${artist} - ${name}`);
-        const url = (yield (0, play_dl_1.search)(artist + " " + name, { limit: 1 }))[0].url;
-        const info = yield ytdl_core_1.default.getInfo(url);
-        const bestFormat = nextBestFormat(info.formats);
-        const transcoder = new prism_media_1.FFmpeg({
-            args: [
-                "-reconnect",
-                "1",
-                "-reconnect_streamed",
-                "1",
-                "-reconnect_delay_max",
-                "5",
-                "-i",
-                bestFormat.url,
-                "-analyzeduration",
-                "0",
-                "-loglevel",
-                "0",
-                "-f",
-                "mp3",
-                "-ar",
-                "48000",
-                "-ac",
-                "2",
-            ],
-            shell: false,
-        });
-        transcoder.pipe((0, fs_1.createWriteStream)(`dl/${artist} - ${name.replace("/", "|")}.mp3`));
-        transcoder.on("end", () => {
-            console.log(`Finished Downloading ${artist} - ${name.replace("/", "|")}.mp3`);
+        if ((0, fs_1.existsSync)(`dl/${artist} - ${name.replace("/", "|")}.mp3`)) {
+            console.log(`Already Downloaded ${artist} - ${name.replace("/", "|")}.mp3`);
             resolve();
-        });
-        transcoder.on("error", () => {
-            console.log(`Failed Downloading ${artist} - ${name.replace("/", "|")}.mp3`);
-            resolve();
-        });
+        }
+        else {
+            console.log(`Downloading ${artist} - ${name}`);
+            const url = (yield (0, play_dl_1.search)(artist + " " + name, { limit: 1 }))[0].url;
+            const info = yield ytdl_core_1.default.getInfo(url);
+            const bestFormat = nextBestFormat(info.formats);
+            const transcoder = new prism_media_1.FFmpeg({
+                args: [
+                    "-reconnect",
+                    "1",
+                    "-reconnect_streamed",
+                    "1",
+                    "-reconnect_delay_max",
+                    "5",
+                    "-i",
+                    bestFormat.url,
+                    "-analyzeduration",
+                    "0",
+                    "-loglevel",
+                    "0",
+                    "-f",
+                    "mp3",
+                    "-ar",
+                    "48000",
+                    "-ac",
+                    "2",
+                ],
+                shell: false,
+            });
+            transcoder.pipe((0, fs_1.createWriteStream)(`dl/${artist} - ${name.replace("/", "|")}.mp3`));
+            transcoder.on("end", () => {
+                console.log(`Finished Downloading ${artist} - ${name.replace("/", "|")}.mp3`);
+                resolve();
+            });
+            transcoder.on("error", () => {
+                console.log(`Failed Downloading ${artist} - ${name.replace("/", "|")}.mp3`);
+                resolve();
+            });
+        }
     }));
 }
 exports.downloadTrack = downloadTrack;
